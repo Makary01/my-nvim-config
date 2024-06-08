@@ -71,4 +71,6 @@ return require('packer').startup(function(use)
     }
 
     use "folke/which-key.nvim"
+
+    use 'svban/YankAssassin.vim'
 end)
