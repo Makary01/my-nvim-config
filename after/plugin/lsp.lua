@@ -8,7 +8,8 @@ end)
 
 -- to learn how to use mason.nvim
 -- read this: https://github.com/VonHeikemen/lsp-zero.nvim/blob/v3.x/doc/md/guide/integrate-with-mason-nvim.md
-local capabilities = vim.lsp.protocol.make_client_capabilities()
+--local capabilities = vim.lsp.protocol.make_client_capabilities()
+local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
 local servers = {
     apex_ls = {
@@ -60,6 +61,11 @@ require('mason-lspconfig').setup({
 })
 
 local cmp = require('cmp')
+local luasnip = require('luasnip')
+luasnip.config.setup{}
+
+require('luasnip.loaders.from_vscode').lazy_load()
+
 local cmp_select = {behavior = cmp.SelectBehavior.Select}
 
 cmp.setup({
@@ -72,5 +78,30 @@ cmp.setup({
         ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
         ['<C-y>'] = cmp.mapping.confirm({ select = true }),
         ['<C-Space>'] = cmp.mapping.complete(),
+        ['<C-j>'] = cmp.mapping(function()
+            if luasnip.expand_or_locally_jumpable() then
+                luasnip.expand_or_jump()
+            end
+        end, { 'i', 's' }),
+        ['<C-k>'] = cmp.mapping(function()
+            if luasnip.locally_jumpable(-1) then
+                luasnip.jump(-1)
+            end
+        end, { 'i', 's' }),
+        ['<C-l>'] = cmp.mapping(function()
+            if luasnip.choice_active() then
+                luasnip.change_choice(1)
+            end
+        end, { 'i' }),
     }),
+    snippet = {
+        expand = function(args)
+            luasnip.lsp_expand(args.body)
+        end,
+    },
+    sources = {
+        { name = 'nvim_lsp' },
+        { name = 'luasnip' },
+        { name = 'path' },
+    },
 })
