@@ -62,7 +62,15 @@ require('mason-lspconfig').setup({
 
 local cmp = require('cmp')
 local luasnip = require('luasnip')
-luasnip.config.setup{}
+luasnip.config.set_config{
+    history = true,
+    updateevents="Textchanged,TextchangedI"
+}
+luasnip.config.setup{
+    history = true,
+    updateevents="Textchanged,TextchangedI"
+}
+
 
 require('luasnip.loaders.from_vscode').lazy_load()
 
@@ -70,6 +78,7 @@ local cmp_select = {behavior = cmp.SelectBehavior.Select}
 
 cmp.setup({
     preselect = 'item',
+    updateevents="Textchanged,TextchangedI",
     completion = {
         completeopt = 'menu,menuone,noinsert'
     },

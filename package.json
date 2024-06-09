@@ -1,0 +1,14 @@
+{
+  "name": "my-nvim-config",
+  "contributes": {
+    "snippets": [
+      {
+        "language": [
+          "apex",
+          "apexcode"
+        ],
+        "path": "snippets/apex.json"
+      }
+    ]
+  }
+}

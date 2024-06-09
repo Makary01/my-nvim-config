@@ -1,0 +1,50 @@
+{
+    "for": {
+        "prefix": "for",
+        "body": [
+            "for (${1:type} ${2:variable} : ${3:Iterable}) {",
+            "\t$0",
+            "}"
+        ],
+        "description": "standard for loop"
+    },
+    "fori": {
+        "prefix": "fori",
+        "body": [
+            "for (Integer ${1:i} = 0; ${1} < ${2:end}; ${1} ++) {",
+            "\t$0",
+            "}"
+        ],
+        "description": "for i loop"
+    },
+    "if": {
+        "prefix": "if",
+        "body": [
+            "if (${1:condition}) {",
+            "\t$0",
+            "}"
+        ],
+        "description": "if statement"
+    },
+    "List": {
+        "prefix": "List",
+        "body": [
+            "List<${1:Object}> ${2:name} = new List<$1>();"
+        ],
+        "description": "List"
+    },
+    "Set": {
+        "prefix": "Set",
+        "body": [
+            "Set<${1:Object}> ${2:name} = new Set<$1>();"
+        ],
+        "description": "Set"
+    },
+    "Map": {
+        "prefix": "Map",
+        "body": [
+            "Map<${1:Object}, ${2:Object}> ${3:name} = new Map<$1, $2>();"
+        ],
+        "description": "Map"
+    }
+}
