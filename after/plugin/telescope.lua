@@ -3,6 +3,11 @@ vim.keymap.set('n', '<leader>pf', builtin.find_files, {desc = "Search files"})
 vim.keymap.set('n', '<leader>ps', function() builtin.grep_string({ search = vim.fn.input("Grep > ") }); end, {desc = "Grep word"})
 vim.keymap.set('n', '<leader>pl', function() builtin.live_grep(); end, {desc = "Live grep"})
 
+vim.keymap.set('n', '<leader>pw', function()
+    local word = vim.fn.expand('<cword>')
+    builtin.grep_string({ search = word})
+end, {desc = 'Grep current word'})
+
 local telescope = require('telescope')
 telescope.load_extension("recent_files")
 telescope.setup{
