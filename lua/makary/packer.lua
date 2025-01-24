@@ -76,8 +76,6 @@ return require('packer').startup(function(use)
 
     use 'm4xshen/autoclose.nvim'
 
-    use 'ggandor/lightspeed.nvim'
-
     use {
         'xixiaofinland/sf.nvim',
         requires = {
