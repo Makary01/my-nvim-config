@@ -7,16 +7,6 @@ return {
     },
 
     config = function()
-        local function has_sfdx_project()
-            local path = vim.fn.findfile("sfdx-project.json", ".;")
-            return path ~= ""
-        end
-
-        -- setup only for sf projects
-        if not has_sfdx_project() then
-            return
-        end
-
         local sf = require('sf')
         sf.setup({
             -- Unless you want to customize, no need to copy-paste any of these
@@ -168,7 +158,17 @@ return {
             if desc then
                 desc = desc .. " [Sf]"
             end
-            vim.keymap.set("n", keys, func, { buffer = true, desc = desc })
+            vim.keymap.set("n", keys, func, { desc = desc })
+        end
+
+        local function nmap_md(keys, fn, desc)
+            nmap(keys, function()
+                if not vim.tbl_contains(vim.g.sf.hotkeys_in_filetypes, vim.bo.filetype) then
+                    vim.notify("Not a Salesforce metadata file", vim.log.levels.INFO)
+                    return
+                end
+                fn()
+            end, desc)
         end
 
         -- Common hotkeys for all files;
@@ -191,23 +191,17 @@ return {
         nmap("<leader>sa", function() sf.run_anonymous_stdin(false) end, "run this buffer anonymously")
 
         -- Hotkeys for metadata files only;
-        if vim.tbl_contains(vim.g.sf.hotkeys_in_filetypes, vim.bo.filetype) then
-            nmap("<leader>sO", sf.org_open_current_file, "open file in target_org")
-            nmap("<leader>sd", sf.diff_in_target_org, "diff in target_org")
-            nmap("<leader>sD", sf.diff_in_org, "diff in org...")
-            nmap("<leader>sp", sf.save_and_push, "push current file")
-            nmap("<leader>sr", sf.retrieve, "retrieve current file")
-            nmap("<leader>sR", sf.rename_apex_class_remote_and_local, "rename current apex from org and local")
-            nmap("<leader>sX", sf.delete_current_apex_remote_and_local, "delete current apex from org and local")
-
-            vim.keymap.set("x", "<leader>sq", sf.run_highlighted_soql,
-                { buffer = true, desc = "SOQL run highlighted text" })
-
-            nmap("<leader>ta", sf.run_all_tests_in_this_file, "test all in this file")
-            nmap("<leader>tt", sf.run_current_test, "test this under cursor")
-            nmap("<leader>to", sf.open_test_select, "open test select buf")
-            nmap("\\s", sf.toggle_sign, "toggle signs for code coverage")
-            nmap("<leader>tr", sf.repeat_last_tests, "repeat last test")
-        end
+        nmap_md("<leader>sO", sf.org_open_current_file, "open file in target_org")
+        nmap_md("<leader>sd", sf.diff_in_target_org, "diff in target_org")
+        nmap_md("<leader>sD", sf.diff_in_org, "diff in org...")
+        nmap_md("<leader>sp", sf.save_and_push, "push current file")
+        nmap_md("<leader>sr", sf.retrieve, "retrieve current file")
+        nmap_md("<leader>sR", sf.rename_apex_class_remote_and_local, "rename current apex from org and local")
+        nmap_md("<leader>sX", sf.delete_current_apex_remote_and_local, "delete current apex from org and local")
+        nmap_md("<leader>ta", sf.run_all_tests_in_this_file, "test all in this file")
+        nmap_md("<leader>tt", sf.run_current_test, "test this under cursor")
+        nmap_md("<leader>to", sf.open_test_select, "open test select buf")
+        nmap_md("\\s", sf.toggle_sign, "toggle signs for code coverage")
+        nmap("<leader>tr", sf.repeat_last_tests, "repeat last test")
     end
 }
