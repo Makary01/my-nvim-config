@@ -87,47 +87,23 @@ return {
             filetypes = { "visualforce" },
             init_options = {
                 embeddedLanguages = {
+                    html = true,
                     css = true,
                     javascript = true
                 }
             }
         })
 
-        -- vim.filetype.add({
-        --     pattern = {
-        --         ['.*/*.page'] = 'visualforce',
-        --     },
-        -- })
+        vim.filetype.add({
+            pattern = {
+                ['.*/*.page'] = 'visualforce',
+            },
+        })
 
         vim.lsp.enable('visualforce_ls')
 
         -- LWC
         vim.lsp.enable('ts_ls')
-
-        vim.lsp.config("eslint", {
-            capabilities = capabilities,
-            on_attach = function(client, bufnr)
-                if not base_on_attach then return end
-
-                local skip_fts = {
-                    html = true,
-                    lwc = true,
-                }
-
-
-                base_on_attach(client, bufnr)
-                vim.api.nvim_create_autocmd("BufWritePre", {
-                    buffer = bufnr,
-                    callback = function()
-                        local ft = vim.bo[bufnr].filetype
-                        if skip_fts[ft] then
-                            return
-                        end
-                        --vim.cmd("LspEslintFixAll")
-                    end,
-                })
-            end,
-        })
 
         vim.lsp.config('lwc_ls', {
             cmd = { "lwc-language-server", "--stdio" }
@@ -138,6 +114,7 @@ return {
         -- capabilities.textDocument.completion.completionItem.snippetSupport = true
 
         vim.lsp.config('html', {
+            filetypes = { "html", "visualforce" },
             capabilities = capabilities,
         })
 

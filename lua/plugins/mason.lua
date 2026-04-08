@@ -21,7 +21,6 @@ return {
             'bash-language-server',
             'css-lsp',
             'cssmodules-language-server',
-            'eslint-lsp',
             'gopls',
             'html-lsp',
             'lua-language-server',

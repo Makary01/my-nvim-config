@@ -99,7 +99,42 @@ return {
             })
         end, { silent = true, noremap = true, desc = "Literal search in current buffer (selection)" })
 
-        vim.keymap.set("n", "gd", builtin.lsp_definitions, { desc = 'Telescope go to [d]efinition' })
+
+        vim.keymap.set("n", "gd", function()
+            local params = vim.lsp.util.make_position_params()
+            local bufnr = vim.api.nvim_get_current_buf()
+
+            local results = vim.lsp.buf_request_sync(bufnr, "textDocument/definition", params, 500)
+
+            local has_definition = false
+
+            if results then
+                for _, res in pairs(results) do
+                    local result = res.result
+                    if result then
+                        if vim.islist(result) then
+                            if #result > 0 then
+                                has_definition = true
+                                break
+                            end
+                        else
+                            -- single Location or LocationLink
+                            has_definition = true
+                            break
+                        end
+                    end
+                end
+            end
+
+            if has_definition then
+                builtin.lsp_definitions()
+            else
+                local key = vim.api.nvim_replace_termcodes("<C-]>", true, false, true)
+                vim.api.nvim_feedkeys(key, "n", false)
+            end
+        end, { desc = "LSP definitions via Telescope, fallback to tag jump" })
+
+        --vim.keymap.set("n", "gd", builtin.lsp_definitions, { desc = 'Telescope go to [d]efinition' })
         vim.keymap.set("n", "gr", builtin.lsp_references, { desc = 'Telescope go to [r]eferences' })
         vim.keymap.set("n", "gi", builtin.lsp_implementations, { desc = 'Telescope go to [i]mplementations' })
 
