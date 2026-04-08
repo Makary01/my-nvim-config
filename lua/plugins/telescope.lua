@@ -10,6 +10,7 @@ return {
     config = function()
         local builtin = require('telescope.builtin')
         local actions = require('telescope.actions')
+        local sorters = require('telescope.sorters')
 
         local open_selected_in_qflist = function(prompt_bufnr)
             actions.send_selected_to_qflist(prompt_bufnr)
@@ -58,7 +59,6 @@ return {
         vim.keymap.set('n', '<C-p>', function()
             builtin.oldfiles({ only_cwd = true })
         end, { desc = 'Telescope old files' })
-        vim.keymap.set('n', '<leader>ff', builtin.live_grep, { desc = 'Telescope live grep' })
 
         function vim.getVisualSelection()
             vim.cmd('noau normal! "vy"')
@@ -73,29 +73,26 @@ return {
             end
         end
 
-        vim.keymap.set("n", "<leader>ff", function()
-            builtin.grep_string({
-                search = vim.fn.input("Search › "),
-            })
-        end, { desc = "Literal search across project" })
+        vim.keymap.set('n', '<leader>ff', builtin.live_grep, { desc = 'Telescope live grep' })
 
         vim.keymap.set("v", "<leader>ff", function()
             local text = vim.getVisualSelection()
-            builtin.grep_string({ search = text })
-        end, { silent = true, noremap = true, desc = "Literal search across project (selection)" })
+            builtin.grep_string({
+                search = text,
+            })
+        end, { silent = true, noremap = true, desc = 'Telescope live grep' })
 
         vim.keymap.set("n", "<leader>fb", function()
             builtin.current_buffer_fuzzy_find({
-                fuzzy = false,
-                case_mode = "smart_case",
+                sorter = sorters.get_substr_matcher({})
             })
         end, { desc = "Literal search in current buffer" })
 
         vim.keymap.set("v", "<leader>fb", function()
             local text = vim.getVisualSelection()
             builtin.current_buffer_fuzzy_find({
-                fuzzy = false,
                 default_text = text,
+                sorter = sorters.get_substr_matcher({})
             })
         end, { silent = true, noremap = true, desc = "Literal search in current buffer (selection)" })
 
@@ -134,7 +131,6 @@ return {
             end
         end, { desc = "LSP definitions via Telescope, fallback to tag jump" })
 
-        --vim.keymap.set("n", "gd", builtin.lsp_definitions, { desc = 'Telescope go to [d]efinition' })
         vim.keymap.set("n", "gr", builtin.lsp_references, { desc = 'Telescope go to [r]eferences' })
         vim.keymap.set("n", "gi", builtin.lsp_implementations, { desc = 'Telescope go to [i]mplementations' })
 
