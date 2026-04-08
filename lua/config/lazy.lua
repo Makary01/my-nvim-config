@@ -22,38 +22,5 @@ require("lazy").setup({
     },
     -- Remove LuaRocks error
     rocks = { enabled = false },
-    checker = { enabled = true },
-})
-
-
-vim.api.nvim_create_autocmd("VimEnter", {
-    callback = function()
-        local ok, lazy = pcall(require, "lazy")
-        if not ok then
-            return
-        end
-
-        local updates = lazy.check({
-            show = false,
-            once = true,
-        })
-
-        if #updates > 0 then
-            vim.notify(
-                ("Lazy: %d plugin update(s) found, syncing…"):format(#updates),
-                vim.log.levels.INFO
-            )
-
-            lazy.sync({
-                show = false,
-                on_done = function()
-                end,
-            })
-        end
-
-        vim.notify(
-            "Lazy: All plugins are up to date ✅",
-            vim.log.levels.INFO
-        )
-    end,
+    checker = { enabled = true, notify = false },
 })

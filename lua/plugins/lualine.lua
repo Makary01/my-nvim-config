@@ -73,6 +73,11 @@ return {
                 lualine_x = {
                     'diagnostics',
                     {
+                        require("lazy.status").updates,
+                        cond = require("lazy.status").has_updates,
+                        color = { fg = "#ff9e64" },
+                    },
+                    {
                         "overseer",
                         label = "",     -- Prefix for task counts
                         colored = true, -- Color the task icons and counts
