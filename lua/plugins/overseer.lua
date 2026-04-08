@@ -3,7 +3,8 @@ return {
     ---@module 'overseer'
     ---@type overseer.SetupOpts
     config = function()
-        require("overseer").setup({
+        local overseer = require("overseer")
+        overseer.setup({
             -- Patch nvim-dap to support preLaunchTask and postDebugTask
             dap = true,
             -- Configure the task output buffer and window
@@ -133,6 +134,17 @@ return {
                     return true
                 end,
             },
+        })
+
+        overseer.register_template({
+            name = "LWC Local Server",
+            builder = function()
+                return {
+                    cmd = { "sf" },
+                    args = { "lightning", "dev", "app", "-n", "LightningSales", "-t", "desktop" },
+                    components = { "default" },
+                }
+            end,
         })
     end
 }
