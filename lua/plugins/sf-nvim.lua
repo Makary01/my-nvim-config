@@ -8,6 +8,69 @@ return {
 
     config = function()
         local sf = require('sf')
+
+        local get_modified_file_paths = function()
+            local uv = vim.uv or vim.loop
+
+            local function is_companion_metadata(path)
+                -- Match files like:
+                --   MyClass.cls-meta.xml
+                --   foo.js-meta.xml
+                --   MyTrigger.trigger-meta.xml
+                --   Template.email-meta.xml
+                --
+                -- But DO NOT exclude standalone metadata like:
+                --   MyFlow.flow-meta.xml
+                -- unless a sibling file without "-meta.xml" actually exists.
+                if not path:match("%-meta%.xml$") then
+                    return false
+                end
+
+                local base = path:gsub("%-meta%.xml$", "")
+                return uv.fs_stat(base) ~= nil
+            end
+
+            local lines = vim.fn.systemlist({
+                "git",
+                "status",
+                "--short",
+                "--untracked-files=all",
+                "--",
+                "force-app/main/",
+            })
+
+            if vim.v.shell_error ~= 0 then
+                print("")
+                return
+            end
+
+            local paths = {}
+
+            for _, line in ipairs(lines) do
+                local status = line:sub(1, 2)
+                local path = line:sub(4)
+
+                -- Handle rename/copy output like:
+                --   R  old/path -> new/path
+                -- keep only the destination path
+                local renamed_to = path:match(" -> (.+)$")
+                if renamed_to then
+                    path = renamed_to
+                end
+
+                local include =
+                    status == "??" or
+                    status:find("M", 1, true) or
+                    status:find("A", 1, true)
+
+                if include and not is_companion_metadata(path) then
+                    table.insert(paths, path)
+                end
+            end
+
+            return table.concat(paths, " ")
+        end
+
         sf.setup({
             -- Unless you want to customize, no need to copy-paste any of these
             -- They are applied automatically
@@ -113,5 +176,12 @@ return {
         nmap_md("<leader>to", sf.open_test_select, "open test select buf")
         nmap_md("\\s", sf.toggle_sign, "toggle signs for code coverage")
         nmap("<leader>tr", sf.repeat_last_tests, "repeat last test")
+        nmap("<leader>sP", function()
+            local file_paths = get_modified_file_paths();
+            if file_paths == nil then
+                vim.notify('No files to push', vim.log.levels.WARN, { title = "sf.nvim" })
+            end
+            sf.push_delta("--source-dir " .. file_paths)
+        end, "push touched files [GIT]")
     end
 }

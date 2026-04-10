@@ -18,6 +18,55 @@ return {
             vim.cmd("copen")
         end
 
+
+        local function feedkey(keys)
+            vim.api.nvim_feedkeys(
+                vim.api.nvim_replace_termcodes(keys, true, false, true),
+                "n",
+                false
+            )
+        end
+
+        local function gd_lsp_or_tag()
+            local bufnr = vim.api.nvim_get_current_buf()
+            local clients = vim.lsp.get_clients({ bufnr = bufnr })
+
+            local definition_client = nil
+            for _, client in ipairs(clients) do
+                if client:supports_method("textDocument/definition") then
+                    definition_client = client
+                    break
+                end
+            end
+
+            if not definition_client then
+                feedkey("<C-]>")
+                return
+            end
+
+            local params = vim.lsp.util.make_position_params(
+                0,
+                definition_client.offset_encoding
+            )
+
+            vim.lsp.buf_request_all(bufnr, "textDocument/definition", params, function(results)
+                local found = false
+
+                for _, res in pairs(results or {}) do
+                    if res.result and not vim.tbl_isempty(res.result) then
+                        found = true
+                        break
+                    end
+                end
+
+                if found then
+                    require("telescope.builtin").lsp_definitions()
+                else
+                    feedkey("<C-]>")
+                end
+            end)
+        end
+
         require('telescope').setup({
             defaults = {
                 color_devicons = true,
@@ -84,41 +133,7 @@ return {
             })
         end, { silent = true, noremap = true, desc = "Literal search in current buffer (selection)" })
 
-
-        vim.keymap.set("n", "gd", function()
-            local params = vim.lsp.util.make_position_params()
-            local bufnr = vim.api.nvim_get_current_buf()
-
-            local results = vim.lsp.buf_request_sync(bufnr, "textDocument/definition", params, 500)
-
-            local has_definition = false
-
-            if results then
-                for _, res in pairs(results) do
-                    local result = res.result
-                    if result then
-                        if vim.islist(result) then
-                            if #result > 0 then
-                                has_definition = true
-                                break
-                            end
-                        else
-                            -- single Location or LocationLink
-                            has_definition = true
-                            break
-                        end
-                    end
-                end
-            end
-
-            if has_definition then
-                builtin.lsp_definitions()
-            else
-                local key = vim.api.nvim_replace_termcodes("<C-]>", true, false, true)
-                vim.api.nvim_feedkeys(key, "n", false)
-            end
-        end, { desc = "LSP definitions via Telescope, fallback to tag jump" })
-
+        vim.keymap.set("n", "gd", gd_lsp_or_tag, { desc = "LSP definition or tag jump" })
         vim.keymap.set("n", "gr", builtin.lsp_references, { desc = 'Telescope go to [r]eferences' })
         vim.keymap.set("n", "gi", builtin.lsp_implementations, { desc = 'Telescope go to [i]mplementations' })
 
