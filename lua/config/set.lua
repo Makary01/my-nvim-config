@@ -94,3 +94,10 @@ vim.keymap.set("n", "<leader>sn", function()
 
     vim.bo.modified = false
 end, { desc = "New scratch buffer (vsplit) with clone + same filetype" })
+
+local visual_utils = require('utils.visual')
+vim.keymap.set("v", "<C-f>", function()
+    local text = visual_utils.getVisualSelection()
+    vim.fn.feedkeys("/\\c" .. text .. '\r')
+end, { noremap = true, silent = true })
+vim.keymap.set("n", "<C-f>", function() vim.fn.feedkeys("/\\c") end, { noremap = true, silent = true })

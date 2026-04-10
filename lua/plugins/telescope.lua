@@ -11,6 +11,7 @@ return {
         local builtin = require('telescope.builtin')
         local actions = require('telescope.actions')
         local sorters = require('telescope.sorters')
+        local utils_visual = require('utils.visual')
 
         local open_selected_in_qflist = function(prompt_bufnr)
             actions.send_selected_to_qflist(prompt_bufnr)
@@ -52,7 +53,7 @@ return {
         vim.keymap.set('n', '<leader>pf', builtin.find_files, { desc = 'Telescope find files' })
 
         vim.keymap.set("v", "<space>pf", function()
-            local text = vim.getVisualSelection()
+            local text = utils_visual.getVisualSelection()
             builtin.find_files({ default_text = text })
         end, { silent = true, noremap = true, desc = "Telescope find files (selection)" })
 
@@ -60,23 +61,10 @@ return {
             builtin.oldfiles({ only_cwd = true })
         end, { desc = 'Telescope old files' })
 
-        function vim.getVisualSelection()
-            vim.cmd('noau normal! "vy"')
-            local text = vim.fn.getreg('v')
-            vim.fn.setreg('v', {})
-
-            text = string.gsub(text, "\n", "")
-            if #text > 0 then
-                return text
-            else
-                return ''
-            end
-        end
-
         vim.keymap.set('n', '<leader>ff', builtin.live_grep, { desc = 'Telescope live grep' })
 
         vim.keymap.set("v", "<leader>ff", function()
-            local text = vim.getVisualSelection()
+            local text = utils_visual.getVisualSelection()
             builtin.grep_string({
                 search = text,
             })
@@ -89,7 +77,7 @@ return {
         end, { desc = "Literal search in current buffer" })
 
         vim.keymap.set("v", "<leader>fb", function()
-            local text = vim.getVisualSelection()
+            local text = utils_visual.getVisualSelection()
             builtin.current_buffer_fuzzy_find({
                 default_text = text,
                 sorter = sorters.get_substr_matcher({})

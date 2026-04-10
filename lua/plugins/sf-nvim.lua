@@ -1,5 +1,5 @@
 return {
-    'xixiaofinland/sf.nvim',
+    'Makary01/sf.nvim',
 
     dependencies = {
         'nvim-treesitter/nvim-treesitter',
