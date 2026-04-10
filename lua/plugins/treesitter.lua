@@ -21,7 +21,6 @@ return { -- Highlight, edit, and navigate code
             'sflog',
             'css',
             'yaml',
-            'visualforce',
         }
         require('nvim-treesitter').install(filetypes)
         vim.treesitter.language.register("html", "visualforce")
