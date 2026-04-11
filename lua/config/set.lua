@@ -28,19 +28,53 @@ vim.o.mouse = 'a'
 
 vim.o.undofile = true
 
--- Diagnostic Config & Keymaps
--- See :help vim.diagnostic.Opts
-vim.diagnostic.config {
+
+vim.diagnostic.config({
     update_in_insert = false,
     severity_sort = true,
-    float = { border = 'rounded', source = 'if_many' },
-    underline = { severity = vim.diagnostic.severity.ERROR },
+    signs = {
+        text = {
+            [vim.diagnostic.severity.ERROR] = "E",
+            [vim.diagnostic.severity.WARN]  = "",
+            [vim.diagnostic.severity.INFO]  = "I",
+            [vim.diagnostic.severity.HINT]  = "H",
+        },
+    },
 
+
+    underline = true,
+
+    -- show virtual text only for errors
     virtual_text = true,
 
-    -- Auto open the float, so you can easily read the errors when jumping with `[d` and `]d`
-    jump = { float = true },
-}
+    -- floating diagnostic window config
+    float = {
+        border = "rounded",
+        source = "if_many",
+        scope = "cursor", -- or "line" if you prefer
+    },
+
+    jump = {
+        float = false,
+    },
+})
+
+-- how long the cursor must stay still before CursorHold fires
+vim.o.updatetime = 250
+
+local diag_hover_group = vim.api.nvim_create_augroup("DiagnosticHover", { clear = true })
+
+vim.api.nvim_create_autocmd("CursorHold", {
+    group = diag_hover_group,
+    callback = function()
+        vim.diagnostic.open_float(nil, {
+            focus = false,
+            scope = "cursor",
+            border = "rounded",
+            source = "if_many",
+        })
+    end,
+})
 
 -- highligh yanked text
 vim.api.nvim_create_autocmd("TextYankPost", {

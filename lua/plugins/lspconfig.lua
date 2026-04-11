@@ -54,18 +54,61 @@ return {
         })
         vim.lsp.enable('lua_ls')
 
-        vim.lsp.enable('gopls', {
-            capabilities = capabilities
-        })
+        vim.lsp.enable('gopls')
 
         -- Apex
         local apex_path = vim.fn.stdpath('data') ..
             '/mason/packages/apex-language-server/extension/dist/apex-jorje-lsp.jar'
 
+        local default_diagnostic_handler = vim.lsp.handlers["textDocument/publishDiagnostics"]
+
+        local ignored_patterns = {
+            "^Variable does not exist: SObjectType$",
+            "^External string does not exist:",
+            "^Non static field cannot be referenced from a static context:",
+            "^Method does not exist or incorrect signature: void getLatitude() from the type Location",
+        }
+
+        local function should_ignore_message(msg)
+            for _, pattern in ipairs(ignored_patterns) do
+                if msg and msg:match(pattern) then
+                    return true
+                end
+            end
+            return false
+        end
+
+        -- Version A: hide all WARN diagnostics
+        -- local function hide_all_warnings(err, result, ctx, config)
+        --     if result and result.diagnostics then
+        --         result = vim.deepcopy(result)
+        --         result.diagnostics = vim.tbl_filter(function(d)
+        --             return d.severity ~= vim.diagnostic.severity.WARN
+        --         end, result.diagnostics)
+        --     end
+        --     return default_diagnostic_handler(err, result, ctx, config)
+        -- end
+
+        -- Version B: hide only selected messages
+        local function hide_selected_messages(err, result, ctx, config)
+            if result and result.diagnostics then
+                result = vim.deepcopy(result)
+                result.diagnostics = vim.tbl_filter(function(d)
+                    return not should_ignore_message(d.message)
+                end, result.diagnostics)
+            end
+            return default_diagnostic_handler(err, result, ctx, config)
+        end
+
         vim.lsp.config('apex_ls', {
             apex_jar_path = apex_path,
-            apex_enable_semantic_errors = true,       -- Whether to allow Apex Language Server to surface semantic errors
-            apex_enable_completion_statistics = true, -- Whether to allow Apex Language Server to collect telemetry on code completion usage
+            apex_enable_semantic_errors = true,
+            apex_enable_completion_statistics = true,
+
+            handlers = {
+                ["textDocument/publishDiagnostics"] = hide_selected_messages,
+                -- ["textDocument/publishDiagnostics"] = hide_all_warnings,
+            },
         })
 
         vim.filetype.add({
@@ -110,8 +153,6 @@ return {
         })
 
         vim.lsp.enable('lwc_ls')
-
-        -- capabilities.textDocument.completion.completionItem.snippetSupport = true
 
         vim.lsp.config('html', {
             filetypes = { "html", "visualforce" },

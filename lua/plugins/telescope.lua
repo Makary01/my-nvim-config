@@ -10,7 +10,6 @@ return {
     config = function()
         local builtin = require('telescope.builtin')
         local actions = require('telescope.actions')
-        local sorters = require('telescope.sorters')
         local utils_visual = require('utils.visual')
 
         local open_selected_in_qflist = function(prompt_bufnr)
@@ -96,6 +95,11 @@ return {
                     path = vim.fn.stdpath('data') .. '/telescope_history',
                     limit = 100,
                 },
+                pickers = {
+                    live_grep = {
+                        additional_args = { "--smart-case" },
+                    },
+                },
             }
         })
 
@@ -120,16 +124,13 @@ return {
         end, { silent = true, noremap = true, desc = 'Telescope live grep' })
 
         vim.keymap.set("n", "<leader>fb", function()
-            builtin.current_buffer_fuzzy_find({
-                sorter = sorters.get_substr_matcher({})
-            })
+            builtin.current_buffer_fuzzy_find({})
         end, { desc = "Literal search in current buffer" })
 
         vim.keymap.set("v", "<leader>fb", function()
             local text = utils_visual.getVisualSelection()
             builtin.current_buffer_fuzzy_find({
-                default_text = text,
-                sorter = sorters.get_substr_matcher({})
+                default_text = text
             })
         end, { silent = true, noremap = true, desc = "Literal search in current buffer (selection)" })
 
