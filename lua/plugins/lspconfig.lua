@@ -111,14 +111,7 @@ return {
             },
         })
 
-        vim.filetype.add({
-            pattern = {
-                ['.*/*.cls'] = 'apex',
-            },
-        })
-
         vim.lsp.enable('apex_ls')
-
 
         vim.lsp.config('visualforce_ls', {
             cmd = {
@@ -135,12 +128,6 @@ return {
                     javascript = true
                 }
             }
-        })
-
-        vim.filetype.add({
-            pattern = {
-                ['.*/*.page'] = 'visualforce',
-            },
         })
 
         vim.lsp.enable('visualforce_ls')

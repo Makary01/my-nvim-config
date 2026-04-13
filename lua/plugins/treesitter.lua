@@ -20,10 +20,10 @@ return { -- Highlight, edit, and navigate code
             'soql',
             'sflog',
             'css',
-            'yaml',
+            'yaml'
         }
         require('nvim-treesitter').install(filetypes)
-        vim.treesitter.language.register("html", "visualforce")
+        --vim.treesitter.language.register("visualforce", "visualforce")
         vim.api.nvim_create_autocmd('FileType', {
             pattern = filetypes,
             callback = function() vim.treesitter.start() end,

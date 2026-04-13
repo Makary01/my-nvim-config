@@ -28,7 +28,6 @@ vim.o.mouse = 'a'
 
 vim.o.undofile = true
 
-
 vim.diagnostic.config({
     update_in_insert = false,
     severity_sort = true,
@@ -51,7 +50,7 @@ vim.diagnostic.config({
     float = {
         border = "rounded",
         source = "if_many",
-        scope = "cursor", -- or "line" if you prefer
+        scope = "cursor",
     },
 
     jump = {
@@ -71,7 +70,6 @@ vim.api.nvim_create_autocmd("CursorHold", {
             focus = false,
             scope = "cursor",
             border = "rounded",
-            source = "if_many",
         })
     end,
 })
@@ -93,13 +91,7 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
     end,
 })
 
-
-vim.filetype.add({
-    pattern = {
-        [".*/force%-app/.*/classes/.*%.cls"]      = "apex",
-        [".*/force%-app/.*/triggers/.*%.trigger"] = "apex",
-    },
-})
+vim.o.winborder = 'rounded'
 
 vim.keymap.set("v", "<Tab>", ">gv", { noremap = true, silent = true })
 vim.keymap.set("v", "<S-Tab>", "<gv", { noremap = true, silent = true })
@@ -135,3 +127,16 @@ vim.keymap.set("v", "<C-f>", function()
     vim.fn.feedkeys("/\\c" .. text .. '\r')
 end, { noremap = true, silent = true })
 vim.keymap.set("n", "<C-f>", function() vim.fn.feedkeys("/\\c") end, { noremap = true, silent = true })
+
+vim.filetype.add({
+    pattern = {
+        ['.*/*.page'] = 'visualforce',
+    },
+})
+
+vim.filetype.add({
+    pattern = {
+        [".*/force%-app/.*/classes/.*%.cls"]      = "apex",
+        [".*/force%-app/.*/triggers/.*%.trigger"] = "apex",
+    },
+})
