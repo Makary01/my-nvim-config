@@ -10,7 +10,7 @@ echo "Starting system setup..."
 
 echo "Installing system dependencies..."
 sudo apt update
-sudo apt install build-essential procps curl file git default-jre -y
+sudo apt install build-essential procps curl file git default-jre jq pandoc -y
 echo "System dependencies installed."
 
 #################################
