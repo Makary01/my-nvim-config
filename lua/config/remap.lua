@@ -23,3 +23,5 @@ vim.api.nvim_create_user_command("CopyAll", function()
     local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
     vim.fn.setreg("+", lines)
 end, {})
+
+vim.keymap.set('t', '<Esc>', [[<C-\><C-n>]])
