@@ -8,3 +8,4 @@ tap "universal-ctags/universal-ctags"
 brew "universal-ctags", args: ["head"]
 brew "tree-sitter-cli"
 brew "typescript"
+brew "gemini-cli"
